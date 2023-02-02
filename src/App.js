@@ -234,7 +234,7 @@ function App() {
       // let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       // pioneer = await pioneer.init()
 
-      let url = "https://dgbbook.nownodes.io"
+      let url = "https://dgbbook.nownodes.io"+"/api/v2/sendtx/"
       let body = {
         url,
         headers: {
@@ -250,6 +250,10 @@ function App() {
       output.resp = resp
       output.success = true
       console.log("output: ",output)
+      if(output.resp.data.result){
+        setTxid(output.resp.data.result)
+      }
+
       //broadcast TX
       // let broadcastBodyTransfer = {
       //   network:"DGB",
