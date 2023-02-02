@@ -3,6 +3,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import axios from 'axios';
 import * as core from "@shapeshiftoss/hdwallet-core";
 import {
   ChakraProvider,
@@ -113,7 +114,7 @@ function App() {
       ]
 
       //@TODO dont use flag fee
-      // let feeRateInfo = await pioneer.GetFeeInfo({coin:"DASH"})
+      // let feeRateInfo = await pioneer.GetFeeInfo({coin:"DGB"})
       // feeRateInfo = feeRateInfo.data
       // console.log("feeRateInfo: ",feeRateInfo)
       let feeRateInfo = 10
@@ -156,13 +157,13 @@ function App() {
       console.log("responsePubkeyChange: ", responsePubkeyChange.xpub)
 
       //get change address
-      let changeAddyIndex = await pioneer.GetChangeAddress({network:'DASH',xpub:responsePubkeyChange.xpub})
+      let changeAddyIndex = await pioneer.GetChangeAddress({network:'DGB',xpub:responsePubkeyChange.xpub})
       changeAddyIndex = changeAddyIndex.data.changeIndex
       console.log("changeAddyIndex: ",changeAddyIndex)
 
       let addressInfo = {
         addressNList: [0x80000000 + 44, 0x80000000 + 20, 0x80000000 + 0, 0, changeAddyIndex],
-        coin: 'Dash',
+        coin: 'DigiByte',
         scriptType: 'p2pkh',
         showDisplay: false
       }
@@ -207,7 +208,7 @@ function App() {
 
 
       let hdwalletTxDescription = {
-        coin: 'Digibyte',
+        coin: 'DigiByte',
         inputs:inputsSelected,
         outputs:outputsFinal,
         version: 1,
@@ -215,6 +216,7 @@ function App() {
       }
 
       //signTx
+      console.log("hdwalletTxDescription: ",hdwalletTxDescription)
       let signedTxTransfer = await sdk.utxo.utxoSignTransaction(hdwalletTxDescription)
       console.log("signedTxTransfer: ",signedTxTransfer)
       // signedTxTransfer = JSON.parse(signedTxTransfer)
@@ -229,26 +231,42 @@ function App() {
     let tag = " | onBroadcast | "
     try{
       console.log("onBroadcast: ",onBroadcast)
-      let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
-      pioneer = await pioneer.init()
+      // let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
+      // pioneer = await pioneer.init()
 
+      let url = "https://dgbbook.nownodes.io"
+      let body = {
+        url,
+        headers: {
+          'api-key': "cf522543-87e2-4dd6-b645-2fbfd0bc61f6",
+          'content-type': 'application/json'
+        },
+        method: 'POST',
+        json:false,
+        data:signedTx,
+      }
+      let output = {}
+      let resp = await axios(body)
+      output.resp = resp
+      output.success = true
+      console.log("output: ",output)
       //broadcast TX
-      let broadcastBodyTransfer = {
-        network:"DASH",
-        serialized:signedTx,
-        txid:"unknown",
-        invocationId:"unknown"
-      }
-      let resultBroadcastTransfer = await pioneer.Broadcast(null,broadcastBodyTransfer)
-      resultBroadcastTransfer = resultBroadcastTransfer.data
-      console.log("resultBroadcastTransfer: ",resultBroadcastTransfer)
+      // let broadcastBodyTransfer = {
+      //   network:"DGB",
+      //   serialized:signedTx,
+      //   txid:"unknown",
+      //   invocationId:"unknown"
+      // }
+      // let resultBroadcastTransfer = await pioneer.Broadcast(null,broadcastBodyTransfer)
       // resultBroadcastTransfer = resultBroadcastTransfer.data
-      if(resultBroadcastTransfer.error){
-        setError(resultBroadcastTransfer.error)
-      }
-      if(resultBroadcastTransfer.txid){
-        setTxid(resultBroadcastTransfer.txid)
-      }
+      // console.log("resultBroadcastTransfer: ",resultBroadcastTransfer)
+      // // resultBroadcastTransfer = resultBroadcastTransfer.data
+      // if(resultBroadcastTransfer.error){
+      //   setError(resultBroadcastTransfer.error)
+      // }
+      // if(resultBroadcastTransfer.txid){
+      //   setTxid(resultBroadcastTransfer.txid)
+      // }
     }catch(e){
       console.error(tag,e)
     }
@@ -273,7 +291,7 @@ function App() {
 
       let path =
         {
-          symbol: 'DASH',
+          symbol: 'DGB',
           address_n: [0x80000000 + 44, 0x80000000 + 20, 0x80000000 + 0],
           coin: 'Bitcoin',
           script_type: 'p2pkh',
@@ -288,7 +306,7 @@ function App() {
       let pioneer = new pioneerApi(configPioneer.spec,configPioneer)
       pioneer = await pioneer.init()
 
-      //get balance DASH
+      //get balance DGB
       let balance = await pioneer.GetBalance({network:'DGB',xpub:responsePubkey.xpub})
       balance = balance.data
       setBalance(balance)
@@ -301,7 +319,7 @@ function App() {
 
       let addressInfo = {
         addressNList: [0x80000000 + 44, 0x80000000 + 20, 0x80000000 + 0, 0, newAddyIndex],
-        coin: 'Dash',
+        coin: 'DigiByte',
         scriptType: 'p2pkh',
         showDisplay: false
       }
@@ -359,7 +377,7 @@ function App() {
             </div>
             <br/>
             {error ? <div>error: {error}</div> : <div></div>}
-            {txid ? <div>txid: <a href={'https://blockchair.com/dash/transaction/?'+txid}>{txid}</a></div> : <div></div>}
+            {txid ? <div>txid: <a href={'https://blockchair.com/DGB/transaction/?'+txid}>{txid}</a></div> : <div></div>}
             {txid ? <div></div> : <div>
               {signedTx ? <div>signedTx: {signedTx}</div> : <div></div>}
             </div>}
