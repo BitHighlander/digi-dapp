@@ -313,7 +313,7 @@ function App() {
       //get balance DGB
       let balance = await pioneer.GetBalance({network:'DGB',xpub:responsePubkey.xpub})
       balance = balance.data
-      setBalance(balance)
+      setBalance(balance / 100000000)
 
       //get new address
       let newAddyIndex = await pioneer.GetChangeAddress({network:'DGB',xpub:responsePubkey.xpub})
